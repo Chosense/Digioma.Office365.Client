@@ -19,11 +19,5 @@ namespace Digioma.Office365.Client.Adal
             return authContext;
         }
 
-        public static async Task<AuthenticationResult> AcquireTokenSilentAsync()
-        {
-            var context = CreateAuthenticationContext();
-            return await context.AcquireTokenSilentAsync(AppSettings.DiscoveryServiceResourceId, new ClientCredential(AppSettings.ClientId, AppSettings.AppKey), new UserIdentifier(ClaimsFactory.ObjectIdentifier(), UserIdentifierType.UniqueId));
-        }
-
     }
 }
