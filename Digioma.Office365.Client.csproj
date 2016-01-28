@@ -102,10 +102,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adal\ADALFactory.cs" />
     <Compile Include="Adal\ADALTokenCache.cs" />
     <Compile Include="Adal\ApplicationDbContext.cs" />
     <Compile Include="Adal\Startup.cs" />
     <Compile Include="AppSettings.cs" />
+    <Compile Include="Claims\ClaimsFactory.cs" />
+    <Compile Include="Discovery\Capability.cs" />
+    <Compile Include="Discovery\DiscoveryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
