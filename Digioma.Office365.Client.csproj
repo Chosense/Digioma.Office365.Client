@@ -126,8 +126,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adal\ADALFactory.cs" />
-    <Compile Include="Adal\ADALTokenCache.cs" />
+    <Compile Include="Adal\AdalFactory.cs" />
+    <Compile Include="Adal\AdalTokenCache.cs" />
     <Compile Include="Adal\ApplicationDbContext.cs" />
     <Compile Include="Adal\Extensions.cs" />
     <Compile Include="Adal\Startup.cs" />

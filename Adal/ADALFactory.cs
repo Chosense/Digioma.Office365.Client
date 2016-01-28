@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace Digioma.Office365.Client.Adal
 {
-    public static class ADALFactory
+    public static class AdalFactory
     {
 
         public static AuthenticationContext CreateAuthenticationContext()
         {
-            var cache = new ADALTokenCache(ClaimsFactory.NameIdentifier());
+            var cache = new AdalTokenCache(ClaimsFactory.NameIdentifier());
             AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, cache);
 
             return authContext;

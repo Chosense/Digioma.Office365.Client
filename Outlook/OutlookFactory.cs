@@ -27,7 +27,7 @@ namespace Digioma.Office365.Client.Outlook
 
         public static async Task<IContactCollection> MyContactsAsync()
         {
-            AuthenticationContext authContext = ADALFactory.CreateAuthenticationContext();
+            AuthenticationContext authContext = AdalFactory.CreateAuthenticationContext();
 
             var discoClient = DiscoveryFactory.CreateDiscoveryClient(authContext);
             var dcr = await discoClient.DiscoverContactsCapabilityAsync();

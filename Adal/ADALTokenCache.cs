@@ -21,14 +21,14 @@ using System.Linq;
 
 namespace Digioma.Office365.Client.Adal
 {
-    public class ADALTokenCache : TokenCache
+    public class AdalTokenCache : TokenCache
     {
         private ApplicationDbContext db = new ApplicationDbContext(AppSettings.Digioma_TokenCacheConnectionString);
         string User;
         UserTokenCache Cache;
 
         // constructor
-        public ADALTokenCache(string user)
+        public AdalTokenCache(string user)
         {
             // associate the cache to the current user of the web app
             User = user;

@@ -38,7 +38,7 @@ namespace Digioma.Office365.Client.Adal
                             ClientCredential credential = new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
                             String signInUserId = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                            AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new ADALTokenCache(signInUserId));
+                            AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new AdalTokenCache(signInUserId));
                             AuthenticationResult result = authContext.AcquireTokenByAuthorizationCode(code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, AppSettings.AADGraphResourceId);
 
                             return Task.FromResult(0);
