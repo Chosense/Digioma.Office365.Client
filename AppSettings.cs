@@ -85,8 +85,9 @@ namespace Digioma.Office365.Client
 
         public static string Digioma_TokenCacheConnectionString
         {
-            get { return !string.IsNullOrEmpty( _digioma_TokenCacheConnectionString) ? _digioma_TokenCacheConnectionString : "DefaultConnection"; }
+            get { return _digioma_TokenCacheConnectionString; }
         }
+
     }
 
 }

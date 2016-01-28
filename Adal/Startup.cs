@@ -8,8 +8,7 @@ using System.IdentityModel.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Owin;
-
-
+using System.Configuration;
 
 namespace Digioma.Office365.Client.Adal
 {
@@ -17,6 +16,9 @@ namespace Digioma.Office365.Client.Adal
     {
         public static void ConfigureAuth(IAppBuilder app)
         {
+            CheckConfig();
+
+
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions());
@@ -61,6 +63,15 @@ namespace Digioma.Office365.Client.Adal
                     }
 
                 });
+        }
+
+
+        private static void CheckConfig()
+        {
+            if(string.IsNullOrEmpty(AppSettings.Digioma_TokenCacheConnectionString))
+            {
+                throw new ConfigurationErrorsException("The 'digioma:TokenCacheConnectionString' app setting has not been defined in the appSettings configuration element. It must be specified as the name or connection string to the token cache database.");
+            }
         }
 
     }
