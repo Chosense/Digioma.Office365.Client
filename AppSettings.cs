@@ -20,66 +20,42 @@ namespace Digioma.Office365.Client
 
         public static string ClientId
         {
-            get
-            {
-                return _clientId;
-            }
+            get { return _clientId; }
         }
 
         public static string AppKey
         {
-            get
-            {
-                return _appKey;
-            }
+            get { return _appKey; }
         }
 
         public static string TenantId
         {
-            get
-            {
-                return _tenantId;
-            }
+            get { return _tenantId; }
         }
 
         public static string AuthorizationUri
         {
-            get
-            {
-                return _authorizationUri;
-            }
+            get { return _authorizationUri; }
         }
 
         public static string Authority
         {
-            get
-            {
-                return String.Format(_authority, _tenantId);
-            }
+            get { return String.Format(_authority, _tenantId); }
         }
 
         public static string AADGraphResourceId
         {
-            get
-            {
-                return _graphResourceId;
-            }
+            get { return _graphResourceId; }
         }
 
         public static string DiscoveryServiceResourceId
         {
-            get
-            {
-                return _discoverySvcResourceId;
-            }
+            get { return _discoverySvcResourceId; }
         }
 
         public static Uri DiscoveryServiceEndpointUri
         {
-            get
-            {
-                return new Uri(_discoverySvcEndpointUri);
-            }
+            get { return new Uri(_discoverySvcEndpointUri); }
         }
 
 
