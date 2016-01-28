@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{6D7E6A88-C57
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digioma.Office365.Client", "Digioma.Office365.Client\Digioma.Office365.Client.csproj", "{B05F237E-604F-47A0-BF49-BA19E4E251BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digioma.Office365.Client", "Digioma.Office365.Client.csproj", "{B05F237E-604F-47A0-BF49-BA19E4E251BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
