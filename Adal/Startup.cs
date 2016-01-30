@@ -11,12 +11,18 @@ using Microsoft.Owin;
 using System.Configuration;
 using System.Runtime.InteropServices;
 using Microsoft.Owin.Security.Notifications;
+using Microsoft.IdentityModel.Protocols;
 
 namespace Digioma.Office365.Client.Adal
 {
     public static class Startup
     {
-        public static void ConfigureAuth(IAppBuilder app, [Optional] Func<AuthorizationCodeReceivedNotification, Task> authorizationCodeReceived)
+        public static void ConfigureAuth(
+            IAppBuilder app,
+            [Optional] Func<AuthorizationCodeReceivedNotification, Task> authorizationCodeReceived,
+            [Optional] Func<RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> redirectToIdentityProvider,
+            [Optional] Func<AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> authenticationFailed
+        )
         {
             CheckConfig();
 
@@ -47,10 +53,8 @@ namespace Digioma.Office365.Client.Adal
                             {
                                 return authorizationCodeReceived(context);
                             }
-                            else
-                            {
-                                return Task.FromResult(0);
-                            }
+
+                            return Task.FromResult(0);
                         },
                         RedirectToIdentityProvider = (context) =>
                         {
@@ -61,12 +65,23 @@ namespace Digioma.Office365.Client.Adal
                             context.ProtocolMessage.RedirectUri = appBaseUrl + "/";
                             context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
 
+                            if(null != redirectToIdentityProvider)
+                            {
+                                return redirectToIdentityProvider(context);
+                            }
+
                             return Task.FromResult(0);
                         },
                         AuthenticationFailed = (context) =>
                         {
                             // Suppress the exception if you don't want to see the error
                             //context.HandleResponse();
+
+                            if(null != authenticationFailed)
+                            {
+                                return authenticationFailed(context);
+                            }
+
                             return Task.FromResult(0);
                         }
                     }
