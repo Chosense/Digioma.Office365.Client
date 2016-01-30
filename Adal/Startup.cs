@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Owin;
 using System.Configuration;
+using System.Runtime.InteropServices;
+using Microsoft.Owin.Security.Notifications;
 
 namespace Digioma.Office365.Client.Adal
 {
     public static class Startup
     {
-        public static void ConfigureAuth(IAppBuilder app)
+        public static void ConfigureAuth(IAppBuilder app, [Optional] Func<AuthorizationCodeReceivedNotification, Task> authorizationCodeReceived)
         {
             CheckConfig();
 
@@ -41,7 +43,14 @@ namespace Digioma.Office365.Client.Adal
                             AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new AdalTokenCache(signInUserId));
                             AuthenticationResult result = authContext.AcquireTokenByAuthorizationCode(code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, AppSettings.AADGraphResourceId);
 
-                            return Task.FromResult(0);
+                            if(null != authorizationCodeReceived)
+                            {
+                                return authorizationCodeReceived(context);
+                            }
+                            else
+                            {
+                                return Task.FromResult(0);
+                            }
                         },
                         RedirectToIdentityProvider = (context) =>
                         {
