@@ -8,8 +8,21 @@ using System.Threading.Tasks;
 
 namespace Digioma.Office365.Client.Claims
 {
-    public static class Extensions
+    public static class ClaimsExtensions
     {
+        public static string Authority(this IIdentity identity)
+        {
+            return string.Format("https://login.windows.net/{0}/", identity.TenantId());
+        }
+
+        public static string Authority(this IPrincipal user)
+        {
+            if(null != user && null != user.Identity)
+            {
+                return user.Identity.Authority();
+            }
+            return null;
+        }
 
         public static string NameIdentifier(this IIdentity identity)
         {
@@ -39,6 +52,22 @@ namespace Digioma.Office365.Client.Claims
             }
             return null;
         }
+
+        public static string TenantId(this IIdentity identity)
+        {
+            return identity.GetFirstClaimValue("http://schemas.microsoft.com/identity/claims/tenantid");
+        }
+
+        public static string TenantId(this IPrincipal user)
+        {
+            if(null != user && null != user.Identity)
+            {
+                return user.Identity.TenantId();
+            }
+            return null;
+        }
+
+
 
         private static string GetFirstClaimValue(this IIdentity identity, string claimType)
         {

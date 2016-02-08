@@ -36,7 +36,7 @@ namespace Digioma.Office365.Client.Outlook
         {
             AuthenticationContext authContext = user.CreateAuthenticationContext();
 
-            var discoClient = DiscoveryFactory.CreateDiscoveryClient(authContext);
+            var discoClient = authContext.CreateDiscoveryClient();
             var dcr = await discoClient.DiscoverContactsCapabilityAsync();
             var outlookClient = CreateOutlookServicesClient(authContext, dcr);
 

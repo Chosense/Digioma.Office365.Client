@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using System;
 using System.Configuration;
 
 namespace Digioma.Office365.Client
@@ -12,7 +13,7 @@ namespace Digioma.Office365.Client
         private static string _authorizationUri = "https://login.windows.net";
         private static string _authority = "https://login.windows.net/{0}/";
 
-        private static string _graphResourceId = "https://graph.windows.net";
+        private static string _graphResourceId = "https://graph.microsoft.com";
         private static string _discoverySvcResourceId = "https://api.office.com/discovery/";
         private static string _discoverySvcEndpointUri = "https://api.office.com/discovery/v1.0/me/";
 
@@ -43,7 +44,7 @@ namespace Digioma.Office365.Client
             get { return String.Format(_authority, _tenantId); }
         }
 
-        public static string AADGraphResourceId
+        public static string GraphResourceId
         {
             get { return _graphResourceId; }
         }
@@ -64,6 +65,16 @@ namespace Digioma.Office365.Client
             get { return _digioma_TokenCacheConnectionString; }
         }
 
+
+        public static ClientCredential CreateClientCredential()
+        {
+            return new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
+        }
+
+        public static AuthenticationContext CreateAuthorityAuthenticationContext()
+        {
+            return new AuthenticationContext(AppSettings.Authority, true);
+        }
     }
 
 }

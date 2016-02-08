@@ -8,7 +8,12 @@ namespace Digioma.Office365.Client.Discovery
 {
     public enum Capability
     {
+        MyFiles,
+        RootSite,
+        Directory,
+        Notes,
         Contacts,
-        Directory
+        Mail,
+        Calendar
     }
 }
