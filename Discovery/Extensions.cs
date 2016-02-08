@@ -18,5 +18,10 @@ namespace Digioma.Office365.Client.Discovery
         {
             return await discoveryClient.DiscoverCapabilityAsync(Capability.Contacts);
         }
+
+        public static async Task<CapabilityDiscoveryResult> DiscoverDirectoryCapabilityAsync(this DiscoveryClient discoveryClient)
+        {
+            return await discoveryClient.DiscoverCapabilityAsync(Capability.Directory);
+        }
     }
 }

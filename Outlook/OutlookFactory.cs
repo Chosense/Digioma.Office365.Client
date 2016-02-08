@@ -7,6 +7,8 @@ using Microsoft.Office365.OutlookServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,7 +29,12 @@ namespace Digioma.Office365.Client.Outlook
 
         public static async Task<IContactCollection> MyContactsAsync()
         {
-            AuthenticationContext authContext = AdalFactory.CreateAuthenticationContext();
+            return await ClaimsPrincipal.Current.MyContactsAsync();
+        }
+
+        public static async Task<IContactCollection> MyContactsAsync(this IPrincipal user)
+        {
+            AuthenticationContext authContext = user.CreateAuthenticationContext();
 
             var discoClient = DiscoveryFactory.CreateDiscoveryClient(authContext);
             var dcr = await discoClient.DiscoverContactsCapabilityAsync();

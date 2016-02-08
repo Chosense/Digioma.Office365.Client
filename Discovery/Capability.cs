@@ -8,6 +8,7 @@ namespace Digioma.Office365.Client.Discovery
 {
     public enum Capability
     {
-        Contacts
+        Contacts,
+        Directory
     }
 }

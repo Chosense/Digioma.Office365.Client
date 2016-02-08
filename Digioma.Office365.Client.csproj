@@ -133,6 +133,7 @@
     <Compile Include="Adal\Startup.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="Claims\ClaimsFactory.cs" />
+    <Compile Include="Claims\Extensions.cs" />
     <Compile Include="Discovery\Capability.cs" />
     <Compile Include="Discovery\DiscoveryFactory.cs" />
     <Compile Include="Discovery\Extensions.cs" />
