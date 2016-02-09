@@ -152,6 +152,7 @@
     <Compile Include="Adal\AdalExtensions.cs" />
     <Compile Include="Adal\Startup.cs" />
     <Compile Include="AppSettings.cs" />
+    <Compile Include="AsyncHelper.cs" />
     <Compile Include="Claims\ClaimsExtensions.cs" />
     <Compile Include="Discovery\Capability.cs" />
     <Compile Include="Discovery\DiscoveryExtensions.cs" />
