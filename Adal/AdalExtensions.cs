@@ -52,11 +52,17 @@ namespace Digioma.Office365.Client.Adal
 
 
 
+        /// <summary>
+        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// </summary>
         public static ITenantDetail CurrentTenantDetails(this ActiveDirectoryClient adClient)
         {
             return AsyncHelper.RunSync(() => adClient.CurrentTenantDetailsAsync());
         }
 
+        /// <summary>
+        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// </summary>
         public static async Task<ITenantDetail> CurrentTenantDetailsAsync(this ActiveDirectoryClient adClient)
         {
             return await adClient.TenantDetails.Where(x => x.ObjectId == AppSettings.TenantId).ExecuteSingleAsync();
@@ -64,6 +70,11 @@ namespace Digioma.Office365.Client.Adal
 
 
 
+        /// <summary>
+        /// Returns 
+        /// </summary>
+        /// <param name="authContext"></param>
+        /// <returns></returns>
         public static AuthenticationResult AcquireAppOnlyToken(this AuthenticationContext authContext)
         {
             return AsyncHelper.RunSync(() => authContext.AcquireAppOnlyTokenAsync());
@@ -71,7 +82,7 @@ namespace Digioma.Office365.Client.Adal
 
         public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext)
         {
-            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
+            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
             return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
         }
 
@@ -81,7 +92,7 @@ namespace Digioma.Office365.Client.Adal
         {
             return await authContext.AcquireTokenAsync(
                 resourceId,
-                new ClientCredential(AppSettings.ClientId, AppSettings.AppKey)
+                new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret)
             );
         }
 
@@ -89,7 +100,7 @@ namespace Digioma.Office365.Client.Adal
         {
             return await authContext.AcquireTokenSilentAsync(
                 resourceId, 
-                new ClientCredential(AppSettings.ClientId, AppSettings.AppKey), 
+                new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret), 
                 new UserIdentifier(ClaimsPrincipal.Current.ObjectIdentifier(), UserIdentifierType.UniqueId)
             );
         }
@@ -99,7 +110,7 @@ namespace Digioma.Office365.Client.Adal
             var authContext = identity.CreateAuthenticationContext();
             return await authContext.AcquireTokenSilentAsync(
                 resourceId,
-                new ClientCredential(AppSettings.ClientId, AppSettings.AppKey),
+                new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret),
                 new UserIdentifier(identity.ObjectIdentifier(), UserIdentifierType.UniqueId)
             );
         }

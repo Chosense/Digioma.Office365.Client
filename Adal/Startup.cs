@@ -43,7 +43,7 @@ namespace Digioma.Office365.Client.Adal
                     AuthorizationCodeReceived = (context) =>
                         {
                             var code = context.Code;
-                            ClientCredential credential = new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
+                            ClientCredential credential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
                             String signInUserId = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                             AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new AdalTokenCache(signInUserId));

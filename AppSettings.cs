@@ -7,7 +7,7 @@ namespace Digioma.Office365.Client
     public class AppSettings
     {
         private static string _clientId = ConfigurationManager.AppSettings["ida:ClientId"] ?? ConfigurationManager.AppSettings["ida:ClientID"];
-        private static string _appKey = ConfigurationManager.AppSettings["ida:ClientSecret"] ?? ConfigurationManager.AppSettings["ida:AppKey"] ?? ConfigurationManager.AppSettings["ida:Password"];
+        private static string _clientSecret = ConfigurationManager.AppSettings["ida:ClientSecret"] ?? ConfigurationManager.AppSettings["ida:AppKey"] ?? ConfigurationManager.AppSettings["ida:Password"];
 
         private static string _tenantId = ConfigurationManager.AppSettings["ida:TenantId"];
         private static string _authorizationUri = ConfigurationManager.AppSettings["ida:AADInstance"] ?? "https://login.microsoftonline.com";
@@ -24,9 +24,9 @@ namespace Digioma.Office365.Client
             get { return _clientId; }
         }
 
-        public static string AppKey
+        public static string ClientSecret
         {
-            get { return _appKey; }
+            get { return _clientSecret; }
         }
 
         public static string TenantId
@@ -72,7 +72,7 @@ namespace Digioma.Office365.Client
 
         public static ClientCredential CreateClientCredential()
         {
-            return new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
+            return new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
         }
 
         public static AuthenticationContext CreateAuthorityAuthenticationContext()
