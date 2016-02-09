@@ -52,34 +52,20 @@ namespace Digioma.Office365.Client.Adal
 
 
 
-        /// <summary>
-        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
-        /// </summary>
-        public static ITenantDetail CurrentTenantDetails(this ActiveDirectoryClient adClient)
-        {
-            return AsyncHelper.RunSync(() => adClient.CurrentTenantDetailsAsync());
-        }
+
+        #region Token acquisition
 
         /// <summary>
-        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// Returns an app-only token using the current authentication context.
         /// </summary>
-        public static async Task<ITenantDetail> CurrentTenantDetailsAsync(this ActiveDirectoryClient adClient)
-        {
-            return await adClient.TenantDetails.Where(x => x.ObjectId == AppSettings.TenantId).ExecuteSingleAsync();
-        }
-
-
-
-        /// <summary>
-        /// Returns 
-        /// </summary>
-        /// <param name="authContext"></param>
-        /// <returns></returns>
         public static AuthenticationResult AcquireAppOnlyToken(this AuthenticationContext authContext)
         {
             return AsyncHelper.RunSync(() => authContext.AcquireAppOnlyTokenAsync());
         }
 
+        /// <summary>
+        /// Returns an app-only token using the current authentication context.
+        /// </summary>
         public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext)
         {
             var cred = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
@@ -88,6 +74,9 @@ namespace Digioma.Office365.Client.Adal
 
 
 
+        /// <summary>
+        /// Acquires a token for the given resource.
+        /// </summary>
         public static async Task<AuthenticationResult> AcquireTokenAsync(this AuthenticationContext authContext, string resourceId)
         {
             return await authContext.AcquireTokenAsync(
@@ -96,6 +85,10 @@ namespace Digioma.Office365.Client.Adal
             );
         }
 
+        /// <summary>
+        /// Acquires a token for the given resource as the currently logged on user, meaning that <see cref="ClaimsPrincipal.Current"/> must
+        /// return a value.
+        /// </summary>
         public static async Task<AuthenticationResult> AcquireTokenSilentAsync(this AuthenticationContext authContext, string resourceId)
         {
             return await authContext.AcquireTokenSilentAsync(
@@ -105,6 +98,9 @@ namespace Digioma.Office365.Client.Adal
             );
         }
 
+        /// <summary>
+        /// Acquires a token for the current user identity to the specified resource.
+        /// </summary>
         public static async Task<AuthenticationResult> AcquireTokenSilentAsync(this IIdentity identity, string resourceId)
         {
             var authContext = identity.CreateAuthenticationContext();
@@ -150,6 +146,8 @@ namespace Digioma.Office365.Client.Adal
         {
             return await user.Identity.AcquireGraphTokenSilentAsync();
         }
+
+        #endregion
 
 
 
@@ -246,5 +244,25 @@ namespace Digioma.Office365.Client.Adal
         {
             return users.Where(x => x.UserPrincipalName == principalName);
         }
+
+
+
+
+        /// <summary>
+        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// </summary>
+        public static ITenantDetail CurrentTenantDetails(this ActiveDirectoryClient adClient)
+        {
+            return AsyncHelper.RunSync(() => adClient.CurrentTenantDetailsAsync());
+        }
+
+        /// <summary>
+        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// </summary>
+        public static async Task<ITenantDetail> CurrentTenantDetailsAsync(this ActiveDirectoryClient adClient)
+        {
+            return await adClient.TenantDetails.Where(x => x.ObjectId == AppSettings.TenantId).ExecuteSingleAsync();
+        }
+
     }
 }
