@@ -10,10 +10,10 @@ namespace Digioma.Office365.Client
         private static string _appKey = ConfigurationManager.AppSettings["ida:ClientSecret"] ?? ConfigurationManager.AppSettings["ida:AppKey"] ?? ConfigurationManager.AppSettings["ida:Password"];
 
         private static string _tenantId = ConfigurationManager.AppSettings["ida:TenantId"];
-        private static string _authorizationUri = "https://login.windows.net";
-        private static string _authority = "https://login.windows.net/{0}/";
+        private static string _authorizationUri = ConfigurationManager.AppSettings["ida:AADInstance"] ?? "https://login.microsoftonline.com";
+        //private static string _authority = "https://login.windows.net/{0}/";
 
-        private static string _graphResourceId = "https://graph.microsoft.com";
+        private static string _graphResourceId = "https://graph.windows.net";
         private static string _discoverySvcResourceId = "https://api.office.com/discovery/";
         private static string _discoverySvcEndpointUri = "https://api.office.com/discovery/v1.0/me/";
 
@@ -31,7 +31,11 @@ namespace Digioma.Office365.Client
 
         public static string TenantId
         {
-            get { return _tenantId; }
+            get
+            {
+                if (string.IsNullOrEmpty(_tenantId)) throw new ConfigurationErrorsException("The 'ida:TenantId' app setting has not been configured.");
+                return _tenantId;
+            }
         }
 
         public static string AuthorizationUri
@@ -41,7 +45,7 @@ namespace Digioma.Office365.Client
 
         public static string Authority
         {
-            get { return String.Format(_authority, _tenantId); }
+            get { return String.Format("{0}/{1}", AuthorizationUri, TenantId); }
         }
 
         public static string GraphResourceId

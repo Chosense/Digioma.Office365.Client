@@ -27,6 +27,21 @@ namespace Digioma.Office365.Client.Adal
 
 
 
+        public static AuthenticationResult AcquireAppOnlyToken(this AuthenticationContext authContext)
+        {
+            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
+            //return AsyncHelper await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
+            return null;
+        }
+
+        public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext)
+        {
+            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.AppKey);
+            return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
+        }
+
+
+
         public static async Task<AuthenticationResult> AcquireTokenAsync(this AuthenticationContext authContext, string resourceId)
         {
             return await authContext.AcquireTokenAsync(
