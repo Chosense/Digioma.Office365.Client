@@ -12,6 +12,7 @@ using System.Configuration;
 using System.Runtime.InteropServices;
 using Microsoft.Owin.Security.Notifications;
 using Microsoft.IdentityModel.Protocols;
+using Digioma.Office365.Client.Claims;
 
 namespace Digioma.Office365.Client.Adal
 {
@@ -44,12 +45,12 @@ namespace Digioma.Office365.Client.Adal
                         {
                             var code = context.Code;
                             ClientCredential credential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
-                            String signInUserId = context.AuthenticationTicket.Identity.FindFirst(ClaimTypes.NameIdentifier).Value;
+                            String signInUserId = context.AuthenticationTicket.Identity.NameIdentifier();//.FindFirst(ClaimTypes.NameIdentifier).Value;
 
                             AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new AdalTokenCache(signInUserId));
                             AuthenticationResult result = authContext.AcquireTokenByAuthorizationCode(code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, AppSettings.GraphResourceId);
 
-                            if(null != authorizationCodeReceived)
+                            if (null != authorizationCodeReceived)
                             {
                                 return authorizationCodeReceived(context);
                             }
