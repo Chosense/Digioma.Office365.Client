@@ -142,10 +142,77 @@ namespace Digioma.Office365.Client.Adal
 
 
 
+        public static IEnumerable<IGroup> ByDisplayNames(this IGroupCollection groups, params string[] displayNames)
+        {
+            return groups.OfType<IGroup>().ByDisplayNames(displayNames);
+        }
+
+        public static IEnumerable<IGroup> ByDisplayNames(this IReadOnlyQueryableSetBase<IGroup> groups, params string[] displayNames)
+        {
+            return AsyncHelper.RunSync(async () => await groups.ByDisplayNamesAsync(displayNames));
+        }
+
+        public static async Task<IEnumerable<IGroup>> ByDisplayNamesAsync(this IGroupCollection groups, params string[] displayNames)
+        {
+            return await groups.OfType<IGroup>().ByDisplayNamesAsync(displayNames).ConfigureAwait(false);
+        }
+
+        public static async Task<IEnumerable<IGroup>> ByDisplayNamesAsync(this IReadOnlyQueryableSetBase<IGroup> groups, params string[] displayNames)
+        {
+            var result = await groups.ByPredicateAsync((g) => displayNames.Contains(g.DisplayName)).ConfigureAwait(false);
+            return result;
+        }
+
+        public static IEnumerable<TSource> ByPredicate<TSource>(this IReadOnlyQueryableSetBase<TSource> set, Func<TSource, bool> predicate)
+        {
+            return AsyncHelper.RunSync(async () => await set.ByPredicateAsync(predicate));
+        }
+
+        public static async Task<IEnumerable<TSource>> ByPredicateAsync<TSource>(this IReadOnlyQueryableSetBase<TSource> set, Func<TSource, bool> predicate)
+        {
+            var list = new List<TSource>();
+            var page = await set.OfType<TSource>().ExecuteAsync();
+            while(null != page)
+            {
+                foreach(var item in from x in page.CurrentPage where predicate(x) select x)
+                {
+                    list.Add(item);
+                }
+                page = await page.GetNextPageAsync();
+            }
+
+            return list;
+        }
+
+
+        public static IEnumerable<string> CheckMemberGroups(this IUser user, ICollection<string> groupIds)
+        {
+            return AsyncHelper.RunSync(async () => await user.CheckMemberGroupsAsync(groupIds));
+        }
+
+
+
         public static IPagedCollection<TSource> Execute<TSource>(this IReadOnlyQueryableSet<TSource> set)
         {
             return AsyncHelper.RunSync(async() => await set.ExecuteAsync());
         }
+
+        public static IPagedCollection<IUser> Execute(this IUserCollection users)
+        {
+            return AsyncHelper.RunSync(async () => await users.ExecuteAsync());
+        }
+
+        public static IPagedCollection<IGroup> Execute(this IGroupCollection groups)
+        {
+            return AsyncHelper.RunSync(async () => await groups.ExecuteAsync());
+        }
+
+        public static IGroup Execute(this IGroupFetcher group)
+        {
+            return AsyncHelper.RunSync(async () => await group.ExecuteAsync());
+        }
+
+
 
         public static TSource ExecuteSingle<TSource>(this IReadOnlyQueryableSet<TSource> set)
         {
@@ -160,6 +227,13 @@ namespace Digioma.Office365.Client.Adal
         public static IEnumerable<string> GetMemberObjects(this IUser user, bool? securityEnabledOnly)
         {
             return AsyncHelper.RunSync(async () => await user.GetMemberObjectsAsync(securityEnabledOnly));
+        }
+
+
+
+        public static IReadOnlyQueryableSet<IUser> ByPrincipalName(this IUserCollection users, string principalName)
+        {
+            return users.Where(x => x.UserPrincipalName == principalName);
         }
     }
 }
