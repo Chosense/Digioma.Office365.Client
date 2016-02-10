@@ -53,6 +53,21 @@ namespace Digioma.Office365.Client.Claims
             return null;
         }
 
+        public static string PreferredLanguage(this IIdentity identity)
+        {
+            return identity.GetFirstClaimValue(AdditionalClaimTypes.PreferredLanguage);
+        }
+
+        public static string PreferredLanguage(this IPrincipal user)
+        {
+            if(null != user)
+            {
+                return user.Identity.PreferredLanguage();
+            }
+
+            return null;
+        }
+
         public static string TenantId(this IIdentity identity)
         {
             return identity.GetFirstClaimValue("http://schemas.microsoft.com/identity/claims/tenantid");
@@ -75,7 +90,7 @@ namespace Digioma.Office365.Client.Claims
             if(null != id)
             {
                 var claim = id.FindFirst(claimType);
-                if(null != claim)
+                if(null != claim && !string.IsNullOrEmpty(claim.Value))
                 {
                     return claim.Value;
                 }
