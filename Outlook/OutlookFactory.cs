@@ -17,31 +17,6 @@ namespace Digioma.Office365.Client.Outlook
     public static class OutlookFactory
     {
 
-        public static OutlookServicesClient CreateOutlookServicesClient(AuthenticationContext authContext, CapabilityDiscoveryResult discoveryResult)
-        {
-            return new OutlookServicesClient(discoveryResult.ServiceEndpointUri,
-                async () =>
-                {
-                    var authResult = await authContext.AcquireTokenSilentAsync(discoveryResult.ServiceResourceId);
-                    return authResult.AccessToken;
-                });
-        }
-
-        public static async Task<IContactCollection> MyContactsAsync()
-        {
-            return await ClaimsPrincipal.Current.MyContactsAsync();
-        }
-
-        public static async Task<IContactCollection> MyContactsAsync(this IPrincipal user)
-        {
-            AuthenticationContext authContext = user.CreateAuthenticationContext();
-
-            var discoClient = authContext.CreateDiscoveryClient();
-            var dcr = await discoClient.DiscoverContactsCapabilityAsync();
-            var outlookClient = CreateOutlookServicesClient(authContext, dcr);
-
-            return outlookClient.Me.Contacts;
-        }
 
     }
 }

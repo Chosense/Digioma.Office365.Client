@@ -14,6 +14,9 @@ namespace Digioma.Office365.Client.Adal
 {
     public static class AdalExtensions
     {
+
+        #region Active directory clients
+
         /// <summary>
         /// Returns an authentication context using a token cache created from the current identity. Assumes that the identity
         /// is a <see cref="ClaimsIdentity"/> identity instance.
@@ -57,29 +60,51 @@ namespace Digioma.Office365.Client.Adal
         public static ActiveDirectoryClient CreateAppOnlyActiveDirectoryClient(this AuthenticationContext authContext, string tenantId)
         {
             var root = new Uri(new Uri(AppSettings.GraphResourceId), tenantId);
-            return new ActiveDirectoryClient(root, async () => (await authContext.AcquireAppOnlyTokenAsync()).AccessToken);
+            return new ActiveDirectoryClient(root, async () => (await authContext.AcquireAppOnlyGraphTokenAsync()).AccessToken);
         }
 
+        #endregion
 
 
 
         #region Token acquisition
 
         /// <summary>
-        /// Returns an app-only token using the current authentication context.
+        /// Returns an app-only token for the given resource.
         /// </summary>
-        public static AuthenticationResult AcquireAppOnlyToken(this AuthenticationContext authContext)
+        /// <param name="resourceId">The resource identifier for which to return the token.</param>
+        /// <returns></returns>
+        public static AuthenticationResult AcquireAppOnlyToken(this AuthenticationContext authContext, string resourceId)
         {
-            return AsyncHelper.RunSync(() => authContext.AcquireAppOnlyTokenAsync());
+            return AsyncHelper.RunSync(async () => await authContext.AcquireAppOnlyTokenAsync(resourceId));
+        }
+
+        /// <summary>
+        /// Returns an app-only token for the given resource.
+        /// </summary>
+        /// <param name="resourceId">The resource identifier for which to return the token.</param>
+        /// <returns></returns>
+        public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext, string resourceId)
+        {
+            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
+            return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
+
         }
 
         /// <summary>
         /// Returns an app-only token using the current authentication context.
         /// </summary>
-        public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext)
+        public static AuthenticationResult AcquireAppOnlyGraphToken(this AuthenticationContext authContext)
         {
-            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
-            return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
+            return AsyncHelper.RunSync(() => authContext.AcquireAppOnlyGraphTokenAsync());
+        }
+
+        /// <summary>
+        /// Returns an app-only token using the current authentication context.
+        /// </summary>
+        public static async Task<AuthenticationResult> AcquireAppOnlyGraphTokenAsync(this AuthenticationContext authContext)
+        {
+            return await authContext.AcquireAppOnlyTokenAsync(AppSettings.GraphResourceId);
         }
 
 
@@ -121,24 +146,6 @@ namespace Digioma.Office365.Client.Adal
             );
         }
 
-
-
-        public static async Task<AuthenticationResult> AcquireDiscoveryServiceTokenSilentAsync(this AuthenticationContext authContext)
-        {
-            return await authContext.AcquireTokenSilentAsync(AppSettings.DiscoveryServiceResourceId);
-        }
-
-        public static async Task<AuthenticationResult> AcquireDiscoveryServiceTokenSilentAsync(this IIdentity identity)
-        {
-            return await identity
-                .CreateAuthenticationContext()
-                .AcquireDiscoveryServiceTokenSilentAsync();
-        }
-
-        public static async Task<AuthenticationResult> AcquireDiscoveryServiceTokenSilentAsync(this IPrincipal user)
-        {
-            return await user.Identity.AcquireDiscoveryServiceTokenSilentAsync();
-        }
 
 
 
@@ -202,7 +209,6 @@ namespace Digioma.Office365.Client.Adal
 
             return list;
         }
-
 
         public static IEnumerable<string> CheckMemberGroups(this IUser user, ICollection<string> groupIds)
         {
@@ -274,7 +280,7 @@ namespace Digioma.Office365.Client.Adal
         {
             var result = await tenants.ByPredicateAsync((t) =>
             {
-                var dom = t.VerifiedDomains.FirstOrDefault(x => x.Name == domain);
+                var dom = t.VerifiedDomains.FirstOrDefault(x => x.Name.Equals(domain, StringComparison.OrdinalIgnoreCase));
                 return dom != null;
             });
 

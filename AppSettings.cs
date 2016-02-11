@@ -15,7 +15,7 @@ namespace Digioma.Office365.Client
 
         private static string _graphResourceId = "https://graph.windows.net";
         private static string _discoverySvcResourceId = "https://api.office.com/discovery/";
-        private static string _discoverySvcEndpointUri = "https://api.office.com/discovery/v1.0/me/";
+        private static string _discoverySvcEndpointUri = "https://api.office.com/discovery/v1.0/";
 
         private static string _digioma_TokenCacheConnectionString = ConfigurationManager.AppSettings["digioma:TokenCacheConnectionString"];
 

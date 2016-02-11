@@ -12,45 +12,20 @@ namespace Digioma.Office365.Client.Discovery
 {
     public static class DiscoveryExtensions
     {
-        public static DiscoveryClient CreateDiscoveryClient(this AuthenticationContext authContext)
-        {
-            return new DiscoveryClient(AppSettings.DiscoveryServiceEndpointUri,
-                async () =>
-                {
-                    var authResult = await authContext.AcquireDiscoveryServiceTokenSilentAsync();
-                    return authResult.AccessToken;
-                });
 
+        public static AuthenticationResult AcquireAppOnlyDiscoveryServiceToken(this AuthenticationContext authContext)
+        {
+            return AsyncHelper.RunSync(async () => await authContext.AcquireAppOnlyDiscoveryServiceTokenAsync());
         }
 
-        public static DiscoveryClient CreateDiscoveryClient(this IIdentity identity)
+        public static async Task<AuthenticationResult> AcquireAppOnlyDiscoveryServiceTokenAsync(this AuthenticationContext authContext)
         {
-            if(null != identity)
-            {
-                return identity
-                    .CreateAuthenticationContext()
-                    .CreateDiscoveryClient();
-            }
-            return null;
+            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
+            return await authContext.AcquireTokenAsync(AppSettings.DiscoveryServiceResourceId, cred);
         }
 
-        public static DiscoveryClient CreateDiscoveryClient(this AuthenticationResult token)
-        {
-            return new DiscoveryClient(AppSettings.DiscoveryServiceEndpointUri,
-                () =>
-                {
-                    return token.AccessToken;
-                });
-        }
 
-        public static DiscoveryClient CreateDiscoveryClient(this IPrincipal user)
-        {
-            if(null != user && null != user.Identity)
-            {
-                return user.Identity.CreateDiscoveryClient();
-            }
-            return null;
-        }
+        #region DiscoveryClient extensions
 
         public static CapabilityDiscoveryResult DiscoverCapability(this DiscoveryClient discoverClient, Capability capability)
         {
@@ -84,5 +59,8 @@ namespace Digioma.Office365.Client.Discovery
         {
             return await discoveryClient.DiscoverCapabilityAsync(Capability.Directory);
         }
+
+        #endregion
+
     }
 }
