@@ -41,12 +41,22 @@ namespace Digioma.Office365.Client.Adal
         /// Creates an <see cref="ActiveDirectoryClient"/> instance in app-only mode from the current authentication context.
         /// </summary>
         /// <remarks>
+        /// This method uses the tenant ID configured in <see cref="AppSettings.TenantId"/>.
         /// To use the returned instance you must give the configured application the proper application permissions to to the
         /// <c>Windows Azure Active Directory</c> application, <c>Read directory data</c> at a minimum.
         /// </remarks>
         public static ActiveDirectoryClient CreateAppOnlyActiveDirectoryClient(this AuthenticationContext authContext)
         {
-            var root = new Uri(new Uri(AppSettings.GraphResourceId), AppSettings.TenantId);
+            return authContext.CreateAppOnlyActiveDirectoryClient(AppSettings.TenantId);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="ActiveDirectoryClient"/> instance in app-only mode from the current authentication context using the
+        /// given tenant ID.
+        /// </summary>
+        public static ActiveDirectoryClient CreateAppOnlyActiveDirectoryClient(this AuthenticationContext authContext, string tenantId)
+        {
+            var root = new Uri(new Uri(AppSettings.GraphResourceId), tenantId);
             return new ActiveDirectoryClient(root, async () => (await authContext.AcquireAppOnlyTokenAsync()).AccessToken);
         }
 
@@ -247,21 +257,46 @@ namespace Digioma.Office365.Client.Adal
 
 
 
-
         /// <summary>
-        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// Returns the first tenant with the given verified domain from the current tenants collection.
         /// </summary>
-        public static ITenantDetail CurrentTenantDetails(this ActiveDirectoryClient adClient)
+        /// <param name="domain">The verified domain, e.g. <c>yourtenant.onmicrosoft.com</c></param>
+        public static ITenantDetail ByDomain(this ITenantDetailCollection tenants, string domain)
         {
-            return AsyncHelper.RunSync(() => adClient.CurrentTenantDetailsAsync());
+            return AsyncHelper.RunSync(async () => await tenants.ByDomainAsync(domain));
         }
 
         /// <summary>
-        /// Returns the tenant that has been configured in the application with the 'ida:TenantId' app setting.
+        /// Returns the first tenant with the given verified domain from the current tenants collection.
         /// </summary>
-        public static async Task<ITenantDetail> CurrentTenantDetailsAsync(this ActiveDirectoryClient adClient)
+        /// <param name="domain">The verified domain, e.g. <c>yourtenant.onmicrosoft.com</c></param>
+        public static async Task<ITenantDetail> ByDomainAsync(this ITenantDetailCollection tenants, string domain)
         {
-            return await adClient.TenantDetails.Where(x => x.ObjectId == AppSettings.TenantId).ExecuteSingleAsync();
+            var result = await tenants.ByPredicateAsync((t) =>
+            {
+                var dom = t.VerifiedDomains.FirstOrDefault(x => x.Name == domain);
+                return dom != null;
+            });
+
+            return result.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Returns the tenant from the current tenants collection with the given tenant id.
+        /// </summary>
+        /// <param name="tenantId">The object ID of the tenant to return.</param>
+        public static ITenantDetail ByTenantId(this ITenantDetailCollection tenants, string tenantId)
+        {
+            return AsyncHelper.RunSync(async () => await tenants.ByTenantIdAsync(tenantId));
+        }
+
+        /// <summary>
+        /// Returns the tenant from the current tenants collection with the given tenant id.
+        /// </summary>
+        /// <param name="tenantId">The object ID of the tenant to return.</param>
+        public static async Task<ITenantDetail> ByTenantIdAsync(this ITenantDetailCollection tenants, string tenantId)
+        {
+            return await tenants.Where(x => x.ObjectId == tenantId).ExecuteSingleAsync();
         }
 
     }
