@@ -25,71 +25,73 @@ namespace Digioma.Office365.Client.Adal
             [Optional] Func<AuthenticationFailedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>, Task> authenticationFailed
         )
         {
-            CheckConfig();
-
-
-            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
-            app.UseCookieAuthentication(new CookieAuthenticationOptions());
-
-            app.UseOpenIdConnectAuthentication(
-                new OpenIdConnectAuthenticationOptions
+            var options = new OpenIdConnectAuthenticationOptions()
+            {
+                Notifications = new OpenIdConnectAuthenticationNotifications()
                 {
-                    ClientId = AppSettings.ClientId,
-                    Authority = AppSettings.Authority,
+                    AuthorizationCodeReceived = authorizationCodeReceived,
+                    RedirectToIdentityProvider = redirectToIdentityProvider,
+                    AuthenticationFailed = authenticationFailed
+                }
+            };
 
-                    Notifications = new OpenIdConnectAuthenticationNotifications()
-                    {
-                    // If there is a code in the OpenID Connect response, redeem it for an access token and refresh token, and store those away.
-                    AuthorizationCodeReceived = (context) =>
-                        {
-                            var code = context.Code;
-                            ClientCredential credential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
-                            String signInUserId = context.AuthenticationTicket.Identity.NameIdentifier();//.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if(null == options.Notifications.AuthorizationCodeReceived)
+            {
+                options.Notifications.AuthorizationCodeReceived = (context) =>
+                {
+                    CheckConfig();
 
-                            AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new AdalTokenCache(signInUserId));
-                            AuthenticationResult result = authContext.AcquireTokenByAuthorizationCode(code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, AppSettings.GraphResourceId);
+                    var code = context.Code;
+                    ClientCredential credential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
+                    String signInUserId = context.AuthenticationTicket.Identity.NameIdentifier();//.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                            if (null != authorizationCodeReceived)
-                            {
-                                return authorizationCodeReceived(context);
-                            }
+                    AuthenticationContext authContext = new AuthenticationContext(AppSettings.Authority, new AdalTokenCache(signInUserId));
+                    AuthenticationResult result = authContext.AcquireTokenByAuthorizationCode(code, new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)), credential, AppSettings.GraphResourceId);
 
-                            return Task.FromResult(0);
-                        },
-                        RedirectToIdentityProvider = (context) =>
-                        {
-                            // This ensures that the address used for sign in and sign out is picked up dynamically from the request
-                            // this allows you to deploy your app (to Azure Web Sites, for example)without having to change settings
-                            // Remember that the base URL of the address used here must be provisioned in Azure AD beforehand.
-                            string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase;
-                            context.ProtocolMessage.RedirectUri = appBaseUrl + "/";
-                            context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
+                    return Task.FromResult(0);
+                };
+            }
 
-                            if(null != redirectToIdentityProvider)
-                            {
-                                return redirectToIdentityProvider(context);
-                            }
-
-                            return Task.FromResult(0);
-                        },
-                        AuthenticationFailed = (context) =>
-                        {
-                            // Suppress the exception if you don't want to see the error
-                            //context.HandleResponse();
-
-                            if(null != authenticationFailed)
-                            {
-                                return authenticationFailed(context);
-                            }
-
-                            return Task.FromResult(0);
-                        }
-                    }
-
-                });
+            ConfigureAuth(app, options);
         }
 
+        public static void ConfigureAuth(IAppBuilder app)
+        {
+            ConfigureAuth(app, new OpenIdConnectAuthenticationOptions());
+        }
+
+        public static void ConfigureAuth(IAppBuilder app, OpenIdConnectAuthenticationOptions options)
+        {
+            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
+            app.UseCookieAuthentication(new CookieAuthenticationOptions());
+
+            if(null == options)
+            {
+                options = new OpenIdConnectAuthenticationOptions();
+            }
+
+            if (string.IsNullOrEmpty(options.ClientId)) options.ClientId = AppSettings.ClientId;
+            if (string.IsNullOrEmpty(options.Authority)) options.Authority = AppSettings.Authority;
+            if (string.IsNullOrEmpty(options.PostLogoutRedirectUri)) options.PostLogoutRedirectUri = AppSettings.PostLogoutRedirectUri;
+            if (null == options.Notifications) options.Notifications = new OpenIdConnectAuthenticationNotifications();
+
+            if(null == options.Notifications.RedirectToIdentityProvider)
+            {
+                options.Notifications.RedirectToIdentityProvider = (context) =>
+                {
+                    // This ensures that the address used for sign in and sign out is picked up dynamically from the request
+                    // this allows you to deploy your app (to Azure Web Sites, for example)without having to change settings
+                    // Remember that the base URL of the address used here must be provisioned in Azure AD beforehand.
+                    string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase;
+                    context.ProtocolMessage.RedirectUri = appBaseUrl + "/";
+                    context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
+
+                    return Task.FromResult(0);
+                };
+            }
+
+            app.UseOpenIdConnectAuthentication(options);
+        }
 
         private static void CheckConfig()
         {
