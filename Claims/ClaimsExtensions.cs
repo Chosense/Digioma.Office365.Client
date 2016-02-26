@@ -70,7 +70,7 @@ namespace Digioma.Office365.Client.Claims
 
         public static string TenantId(this IIdentity identity)
         {
-            return identity.GetFirstClaimValue("http://schemas.microsoft.com/identity/claims/tenantid");
+            return identity.GetFirstClaimValue(AdditionalClaimTypes.TenantId);
         }
 
         public static string TenantId(this IPrincipal user)
