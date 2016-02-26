@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Azure.ActiveDirectory.GraphClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -24,64 +25,60 @@ namespace Digioma.Office365.Client.Claims
             return null;
         }
 
+        public static string ClaimValue(this IIdentity identity, string claimType)
+        {
+            return identity.GetFirstClaimValue(claimType);
+        }
+
+        public static string ClaimValue(this IPrincipal user, string claimType)
+        {
+            if(null != user && null != user.Identity)
+            {
+                return user.Identity.ClaimValue(claimType);
+            }
+
+            return null;
+        }
+
         public static string NameIdentifier(this IIdentity identity)
         {
-            return identity.GetFirstClaimValue(ClaimTypes.NameIdentifier);
+            return identity.ClaimValue(ClaimTypes.NameIdentifier);
         }
 
         public static string NameIdentifier(this IPrincipal user)
         {
-            if(null != user)
-            {
-                return user.Identity.NameIdentifier();
-            }
-
-            return null;
+            return user.ClaimValue(ClaimTypes.NameIdentifier);
         }
 
         public static string ObjectIdentifier(this IIdentity identity)
         {
-            return identity.GetFirstClaimValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
+            return identity.ClaimValue(AdditionalClaimTypes.ObjectIdentifier);
         }
 
         public static string ObjectIdentifier(this IPrincipal user)
         {
-            if(null != user)
-            {
-                return user.Identity.ObjectIdentifier();
-            }
-            return null;
+            return user.ClaimValue(AdditionalClaimTypes.ObjectIdentifier);
         }
 
         public static string PreferredLanguage(this IIdentity identity)
         {
-            return identity.GetFirstClaimValue(AdditionalClaimTypes.PreferredLanguage);
+            return identity.ClaimValue(AdditionalClaimTypes.PreferredLanguage);
         }
 
         public static string PreferredLanguage(this IPrincipal user)
         {
-            if(null != user)
-            {
-                return user.Identity.PreferredLanguage();
-            }
-
-            return null;
+            return user.ClaimValue(AdditionalClaimTypes.PreferredLanguage);
         }
 
         public static string TenantId(this IIdentity identity)
         {
-            return identity.GetFirstClaimValue(AdditionalClaimTypes.TenantId);
+            return identity.ClaimValue(AdditionalClaimTypes.TenantId);
         }
 
         public static string TenantId(this IPrincipal user)
         {
-            if(null != user && null != user.Identity)
-            {
-                return user.Identity.TenantId();
-            }
-            return null;
+            return user.ClaimValue(AdditionalClaimTypes.TenantId);
         }
-
 
 
         private static string GetFirstClaimValue(this IIdentity identity, string claimType)
