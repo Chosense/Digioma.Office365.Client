@@ -18,6 +18,20 @@ namespace Digioma.Office365.Client.Adal
 {
     public static class Startup
     {
+
+        public async static Task DefaultRedirectToIdentityProvider(RedirectToIdentityProviderNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions> context)
+        {
+            // This ensures that the address used for sign in and sign out is picked up dynamically from the request
+            // this allows you to deploy your app (to Azure Web Sites, for example)without having to change settings
+            // Remember that the base URL of the address used here must be provisioned in Azure AD beforehand.
+            string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase;
+            context.ProtocolMessage.RedirectUri = appBaseUrl + "/";
+            context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
+
+            await Task.Yield();
+        }
+
+
         public static void ConfigureAuth(
             IAppBuilder app,
             [Optional] Func<AuthorizationCodeReceivedNotification, Task> authorizationCodeReceived,
@@ -75,20 +89,7 @@ namespace Digioma.Office365.Client.Adal
             if (string.IsNullOrEmpty(options.PostLogoutRedirectUri)) options.PostLogoutRedirectUri = AppSettings.PostLogoutRedirectUri;
             if (null == options.Notifications) options.Notifications = new OpenIdConnectAuthenticationNotifications();
 
-            if(null == options.Notifications.RedirectToIdentityProvider)
-            {
-                options.Notifications.RedirectToIdentityProvider = (context) =>
-                {
-                    // This ensures that the address used for sign in and sign out is picked up dynamically from the request
-                    // this allows you to deploy your app (to Azure Web Sites, for example)without having to change settings
-                    // Remember that the base URL of the address used here must be provisioned in Azure AD beforehand.
-                    string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase;
-                    context.ProtocolMessage.RedirectUri = appBaseUrl + "/";
-                    context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
-
-                    return Task.FromResult(0);
-                };
-            }
+            if (null == options.Notifications.RedirectToIdentityProvider) options.Notifications.RedirectToIdentityProvider = Startup.DefaultRedirectToIdentityProvider;
 
             app.UseOpenIdConnectAuthentication(options);
         }

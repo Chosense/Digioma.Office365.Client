@@ -20,6 +20,10 @@ namespace Digioma.Office365.Client.Claims
         /// </summary>
         public const string PreferredLanguage = Prefix + "preferredlanguage";
 
+        /// <summary>
+        /// The the for a claim that specifies the domain of the user's account.
+        /// </summary>
+        public const string Domain = Prefix + "domain";
 
 
         /// <summary>
