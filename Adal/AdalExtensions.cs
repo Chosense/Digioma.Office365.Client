@@ -63,6 +63,16 @@ namespace Digioma.Office365.Client.Adal
             return new ActiveDirectoryClient(root, async () => (await authContext.AcquireAppOnlyGraphTokenAsync()).AccessToken);
         }
 
+        public static ActiveDirectoryClient CreateAppOnlyActiveDirectoryClient(this AuthenticationContext authContext, string tenantId, string clientId, string clientSecret)
+        {
+            var root = new Uri(new Uri(AppSettings.GraphResourceId), tenantId);
+            return new ActiveDirectoryClient(root, async () =>
+            {
+                var token = await authContext.AcquireAppOnlyGraphTokenAsync(clientId, clientSecret);
+                return token.AccessToken;
+            });
+        }
+
         #endregion
 
 
@@ -86,9 +96,20 @@ namespace Digioma.Office365.Client.Adal
         /// <returns></returns>
         public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext, string resourceId)
         {
-            var cred = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
-            return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
+            return await authContext.AcquireAppOnlyTokenAsync(resourceId, AppSettings.ClientId, AppSettings.ClientSecret);
+        }
 
+        /// <summary>
+        /// Returns an app-only token for the resource specified in <paramref name="resourceId"/> using the given <paramref name="clientId"/> and <paramref name="clientSecret"/>.
+        /// </summary>
+        /// <param name="resourceId">The resource identifier for which to return the token.</param>
+        /// <param name="clientId">The client ID to use, i.e. the ID (guid) of the application.</param>
+        /// <param name="clientSecret">The client secret or key to authenticate with.</param>
+        /// <returns></returns>
+        public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext, string resourceId, string clientId, string clientSecret)
+        {
+            var cred = new ClientCredential(clientId, clientSecret);
+            return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
         }
 
         /// <summary>
@@ -100,11 +121,20 @@ namespace Digioma.Office365.Client.Adal
         }
 
         /// <summary>
-        /// Returns an app-only token using the current authentication context.
+        /// Returns an app-only token for Microsoft Graph using the current authentication context.
         /// </summary>
         public static async Task<AuthenticationResult> AcquireAppOnlyGraphTokenAsync(this AuthenticationContext authContext)
         {
             return await authContext.AcquireAppOnlyTokenAsync(AppSettings.GraphResourceId);
+        }
+
+        /// <summary>
+        /// Returns an app-only token for Microsoft Graph using the current authentication context authenticating the application 
+        /// using the given <paramref name="clientId"/> and <paramref name="clientSecret"/>.
+        /// </summary>
+        public static async Task<AuthenticationResult> AcquireAppOnlyGraphTokenAsync(this AuthenticationContext authContext, string clientId, string clientSecret)
+        {
+            return await authContext.AcquireAppOnlyTokenAsync(AppSettings.GraphResourceId, clientId, clientSecret);
         }
 
 

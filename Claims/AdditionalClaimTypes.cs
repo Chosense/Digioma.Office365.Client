@@ -20,5 +20,26 @@ namespace Digioma.Office365.Client.Claims
         /// </summary>
         public const string PreferredLanguage = Prefix + "preferredlanguage";
 
+        /// <summary>
+        /// The the for a claim that specifies the domain of the user's account.
+        /// </summary>
+        public const string Domain = Prefix + "domain";
+
+
+        /// <summary>
+        /// Defined by Microsoft. The URI for a claim that specifies the name of the identity provider.
+        /// </summary>
+        public const string IdentityProvider = "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
+
+        /// <summary>
+        /// Defined by Microsoft. The URI fot a claim that contains the directory object ID of a security principal.
+        /// </summary>
+        public const string ObjectIdentifier = "http://schemas.microsoft.com/identity/claims/objectidentifier";
+
+        /// <summary>
+        /// Defined by Microsoft. The URI for a claim that contains the tenant ID of a security principal.
+        /// </summary>
+        public const string TenantId = "http://schemas.microsoft.com/identity/claims/tenantid";
+
     }
 }

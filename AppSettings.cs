@@ -9,7 +9,7 @@ namespace Digioma.Office365.Client
         private static string _clientId = ConfigurationManager.AppSettings["ida:ClientId"] ?? ConfigurationManager.AppSettings["ida:ClientID"];
         private static string _clientSecret = ConfigurationManager.AppSettings["ida:ClientSecret"] ?? ConfigurationManager.AppSettings["ida:AppKey"] ?? ConfigurationManager.AppSettings["ida:Password"];
 
-        private static string _tenantId = ConfigurationManager.AppSettings["ida:TenantId"];
+        private static string _tenantId = ConfigurationManager.AppSettings["ida:TenantId"] ?? "common"; // Default to the fixed "tenant" that is used by multi-tenant applications.
         private static string _authorizationUri = ConfigurationManager.AppSettings["ida:AADInstance"] ?? "https://login.microsoftonline.com";
         //private static string _authority = "https://login.windows.net/{0}/";
 
@@ -17,6 +17,7 @@ namespace Digioma.Office365.Client
         private static string _discoverySvcResourceId = "https://api.office.com/discovery/";
         private static string _discoverySvcEndpointUri = "https://api.office.com/discovery/v1.0/";
 
+        private static string _postLogoutRedirectUri = ConfigurationManager.AppSettings["ida:PostLogoutRedirectUri"];
         private static string _digioma_TokenCacheConnectionString = ConfigurationManager.AppSettings["digioma:TokenCacheConnectionString"];
 
         public static string ClientId
@@ -36,6 +37,11 @@ namespace Digioma.Office365.Client
                 if (string.IsNullOrEmpty(_tenantId)) throw new ConfigurationErrorsException("The 'ida:TenantId' app setting has not been configured.");
                 return _tenantId;
             }
+        }
+
+        public static string PostLogoutRedirectUri
+        {
+            get { return _postLogoutRedirectUri; }
         }
 
         public static string AuthorizationUri
