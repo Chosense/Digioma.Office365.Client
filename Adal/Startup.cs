@@ -76,6 +76,24 @@ namespace Digioma.Office365.Client.Adal
 
         public static void ConfigureAuth(IAppBuilder app, OpenIdConnectAuthenticationOptions options)
         {
+            if(string.IsNullOrEmpty(options.RedirectUri))
+            {
+                if(!string.IsNullOrEmpty(AppSettings.ReplyUri))
+                {
+                    options.RedirectUri = AppSettings.ReplyUri;
+                }
+                else
+                {
+                    var url = HttpContext.Current.Request.Url;
+                    var port = "";
+                    if ((url.Scheme == "http" && url.Port != 80) || (url.Scheme == "https" && url.Port != 443))
+                    {
+                        port = ":" + url.Port;
+                    }
+
+                    options.RedirectUri = string.Format("{0}://{1}{2}/", url.Scheme, url.Host, port);
+                }
+            }
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
             app.UseCookieAuthentication(new CookieAuthenticationOptions());
 
