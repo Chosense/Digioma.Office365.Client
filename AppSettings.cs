@@ -17,6 +17,7 @@ namespace Digioma.Office365.Client
         private static string _discoverySvcResourceId = "https://api.office.com/discovery/";
         private static string _discoverySvcEndpointUri = "https://api.office.com/discovery/v1.0/";
 
+        private static string _replyUri = ConfigurationManager.AppSettings["ida:ReplyUri"];
         private static string _postLogoutRedirectUri = ConfigurationManager.AppSettings["ida:PostLogoutRedirectUri"];
         private static string _digioma_TokenCacheConnectionString = ConfigurationManager.AppSettings["digioma:TokenCacheConnectionString"];
 
@@ -32,16 +33,17 @@ namespace Digioma.Office365.Client
 
         public static string TenantId
         {
-            get
-            {
-                if (string.IsNullOrEmpty(_tenantId)) throw new ConfigurationErrorsException("The 'ida:TenantId' app setting has not been configured.");
-                return _tenantId;
-            }
+            get { return _tenantId; }
         }
 
         public static string PostLogoutRedirectUri
         {
             get { return _postLogoutRedirectUri; }
+        }
+
+        public static string ReplyUri
+        {
+            get { return _replyUri; }
         }
 
         public static string AuthorizationUri
