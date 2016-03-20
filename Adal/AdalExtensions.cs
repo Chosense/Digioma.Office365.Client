@@ -63,6 +63,11 @@ namespace Digioma.Office365.Client.Adal
             return new ActiveDirectoryClient(root, async () => (await authContext.AcquireAppOnlyGraphTokenAsync()).AccessToken);
         }
 
+        public static ActiveDirectoryClient CreateAppOnlyActiveDirectoryClient(this AuthenticationContext authContext, Guid tenantId)
+        {
+            return authContext.CreateAppOnlyActiveDirectoryClient(tenantId.ToString());
+        }
+
         public static ActiveDirectoryClient CreateAppOnlyActiveDirectoryClient(this AuthenticationContext authContext, string tenantId, string clientId, string clientSecret)
         {
             var root = new Uri(new Uri(AppSettings.GraphResourceId), tenantId);
@@ -333,6 +338,11 @@ namespace Digioma.Office365.Client.Adal
         public static async Task<ITenantDetail> ByTenantIdAsync(this ITenantDetailCollection tenants, string tenantId)
         {
             return await tenants.Where(x => x.ObjectId == tenantId).ExecuteSingleAsync();
+        }
+
+        public static async Task<ITenantDetail> ByTenantIdAsync(this ITenantDetailCollection tenants, Guid tenantId)
+        {
+            return await tenants.ByTenantIdAsync(tenantId.ToString());
         }
 
     }

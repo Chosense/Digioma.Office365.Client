@@ -54,6 +54,26 @@ namespace Digioma.Office365.Client.Claims
             return identity.ClaimValue(AdditionalClaimTypes.Domain);
         }
 
+        public static string FirstName (this IPrincipal user)
+        {
+            return user.Identity.FirstName();
+        }
+
+        public static string FirstName(this IIdentity identity)
+        {
+            return identity.ClaimValue(ClaimTypes.GivenName);
+        }
+
+        public static string LastName(this IPrincipal user)
+        {
+            return user.Identity.LastName();
+        }
+
+        public static string LastName(this IIdentity identity)
+        {
+            return identity.ClaimValue(ClaimTypes.Surname);
+        }
+
         public static string NameIdentifier(this IIdentity identity)
         {
             return identity.ClaimValue(ClaimTypes.NameIdentifier);
