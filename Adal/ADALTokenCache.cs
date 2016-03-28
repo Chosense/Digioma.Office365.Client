@@ -85,14 +85,19 @@ namespace Digioma.Office365.Client.Adal
             // if state changed
             if (this.HasStateChanged)
             {
-                Cache = new UserTokenCache
+                Cache = db.UserTokenCacheList.FirstOrDefault(x => x.webUserUniqueId == User);
+                if(null == Cache)
                 {
-                    webUserUniqueId = User,
-                    cacheBits = this.Serialize(),
-                    LastWrite = DateTime.Now
-                };
-                //// update the DB and the lastwrite                
-                db.Entry(Cache).State = Cache.UserTokenCacheId == 0 ? EntityState.Added : EntityState.Modified;
+                    Cache = new UserTokenCache()
+                    {
+                        webUserUniqueId = User
+                    };
+                    db.UserTokenCacheList.Add(Cache);
+                }
+
+                Cache.cacheBits = this.Serialize();
+                Cache.LastWrite = DateTime.Now;
+
                 db.SaveChanges();
                 this.HasStateChanged = false;
             }

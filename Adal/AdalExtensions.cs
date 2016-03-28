@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Digioma.Office365.Client.Adal
 {
@@ -37,6 +38,7 @@ namespace Digioma.Office365.Client.Adal
         {
             return user.Identity.CreateAuthenticationContext();
         }
+
 
 
 
@@ -76,6 +78,38 @@ namespace Digioma.Office365.Client.Adal
                 var token = await authContext.AcquireAppOnlyGraphTokenAsync(clientId, clientSecret);
                 return token.AccessToken;
             });
+        }
+
+
+
+        public static ActiveDirectoryClient CreateActiveDirectoryClient(this IIdentity identity)
+        {
+            var tenantId = identity.TenantId();
+            var root = new Uri(new Uri(AppSettings.GraphResourceId), tenantId);
+
+            return new ActiveDirectoryClient(root, async () =>
+            {
+                List<TokenCacheItem> items = null;
+
+                await Task.Run(() =>
+                {
+                    var cache = new AdalTokenCache(identity.NameIdentifier());
+                    items = cache.ReadItems().ToList();
+                });
+
+                if(items.Count > 0)
+                {
+                    return items.First().AccessToken;
+                }
+
+                return null;
+            });
+        }
+
+        public static ActiveDirectoryClient CreateActiveDirectoryClient(this IPrincipal user)
+        {
+            if (null != user && null != user.Identity) return user.Identity.CreateActiveDirectoryClient();
+            return null;
         }
 
         #endregion
@@ -197,6 +231,19 @@ namespace Digioma.Office365.Client.Adal
         public static async Task<AuthenticationResult> AcquireGraphTokenSilentAsync(this IPrincipal user)
         {
             return await user.Identity.AcquireGraphTokenSilentAsync();
+        }
+
+        public static async Task<AuthenticationResult> AcquireGraphTokenByCodeAsync(this AuthenticationContext authContext, string code)
+        {
+            var credential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
+            var token = await authContext.AcquireTokenByAuthorizationCodeAsync(
+                code,
+                new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)),
+                credential,
+                AppSettings.GraphResourceId
+            );
+
+            return token;
         }
 
         #endregion
