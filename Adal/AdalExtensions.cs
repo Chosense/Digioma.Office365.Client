@@ -392,5 +392,20 @@ namespace Digioma.Office365.Client.Adal
             return await tenants.ByTenantIdAsync(tenantId.ToString());
         }
 
+
+
+        public static async Task<IEnumerable<TSource>> GetAllAsync<TSource>(this IPagedCollection<TSource> source)
+        {
+            var list = new List<TSource>();
+
+            IEnumerable<TSource> page = source.CurrentPage;
+            while(null != page)
+            {
+                list.AddRange(page.ToList());
+                page = (IEnumerable<TSource>)await source.GetNextPageAsync();
+            }
+
+            return list;
+        }
     }
 }

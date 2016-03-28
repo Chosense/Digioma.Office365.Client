@@ -25,6 +25,20 @@ namespace Digioma.Office365.Client.Claims
             return null;
         }
 
+        public static void AddClaim(this IIdentity identity, string claimType, string claimValue)
+        {
+            var claimId = identity as ClaimsIdentity;
+            if(null != claimId)
+            {
+                claimId.AddClaim(new Claim(claimType, claimValue));
+            }
+        }
+
+        public static void AddClaim(this IPrincipal user, string claimType, string claimValue)
+        {
+            if (null != user) user.Identity.AddClaim(claimType, claimValue);
+        }
+
         public static string ClaimValue(this IIdentity identity, string claimType)
         {
             return identity.GetFirstClaimValue(claimType);
