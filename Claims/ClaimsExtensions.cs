@@ -98,6 +98,22 @@ namespace Digioma.Office365.Client.Claims
             return user.ClaimValue(ClaimTypes.NameIdentifier);
         }
 
+        /// <summary>
+        /// Returns true if the current user is a member of at least one of the specified roles.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        public static bool IsInAnyRole(this IPrincipal user, params string[] roles)
+        {
+            if(null != user && null != roles && roles.Length > 0)
+            {
+                var inRoles = from x in roles where user.IsInRole(x) select x;
+                return inRoles.Count() > 0;
+            }
+            return false;
+        }
+
         public static string ObjectIdentifier(this IIdentity identity)
         {
             return identity.ClaimValue(AdditionalClaimTypes.ObjectIdentifier);
