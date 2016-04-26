@@ -19,6 +19,12 @@ namespace Digioma.Office365.Client.Adal
 
         #region Active directory clients
 
+        public static AuthenticationContext CreateAuthenticationContext(string tenantId)
+        {
+            var authority = string.Format("{0}/{1}", AppSettings.AuthorizationUri, tenantId);
+            return new AuthenticationContext(authority);
+        }
+
         /// <summary>
         /// Returns an authentication context using a token cache created from the current identity. Assumes that the identity
         /// is a <see cref="ClaimsIdentity"/> identity instance.
@@ -149,7 +155,7 @@ namespace Digioma.Office365.Client.Adal
         public static async Task<AuthenticationResult> AcquireAppOnlyTokenAsync(this AuthenticationContext authContext, string resourceId, string clientId, string clientSecret)
         {
             var cred = new ClientCredential(clientId, clientSecret);
-            return await authContext.AcquireTokenAsync(AppSettings.GraphResourceId, cred);
+            return await authContext.AcquireTokenAsync(resourceId, cred);
         }
 
         /// <summary>
