@@ -3,6 +3,7 @@ using Microsoft.Azure.ActiveDirectory.GraphClient;
 using Microsoft.Azure.ActiveDirectory.GraphClient.Extensions;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -397,12 +398,12 @@ namespace Digioma.Office365.Client.Adal
         public static async Task<IEnumerable<TSource>> GetAllAsync<TSource>(this IPagedCollection<TSource> source)
         {
             var list = new List<TSource>();
+            if(null != source.CurrentPage) list.AddRange(source.CurrentPage);
 
-            IEnumerable<TSource> page = source.CurrentPage;
-            while(null != page)
+            while(source.MorePagesAvailable)
             {
-                list.AddRange(page.ToList());
-                page = (IEnumerable<TSource>)await source.GetNextPageAsync();
+                source = await source.GetNextPageAsync();
+                if(null != source.CurrentPage) list.AddRange(source.CurrentPage);
             }
 
             return list;
