@@ -242,11 +242,16 @@ namespace Digioma.Office365.Client.Adal
 
         public static async Task<AuthenticationResult> AcquireGraphTokenByCodeAsync(this AuthenticationContext authContext, string code)
         {
-            var credential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
+            var clientCredential = new ClientCredential(AppSettings.ClientId, AppSettings.ClientSecret);
+            return await authContext.AcquireGraphTokenByCodeAsync(code, clientCredential);
+        }
+
+        public static async Task<AuthenticationResult> AcquireGraphTokenByCodeAsync(this AuthenticationContext authContext, string code, ClientCredential clientCredential)
+        {
             var token = await authContext.AcquireTokenByAuthorizationCodeAsync(
                 code,
                 new Uri(HttpContext.Current.Request.Url.GetLeftPart(UriPartial.Path)),
-                credential,
+                clientCredential,
                 AppSettings.GraphResourceId
             );
 
